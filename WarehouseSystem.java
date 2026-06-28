@@ -151,26 +151,33 @@ public class WarehouseSystem {
     }
 
     public static class OrderManager implements OrderManagementModule {
-        private final PriorityQueue<Order> pendingOrders = new PriorityQueue<>();
+        private final List<Order> pendingList = new ArrayList<>();
+        private final PriorityQueue<Order> priorityQueue = new PriorityQueue<>();
         private final Stack<Order> completedOrders = new Stack<>();
 
         @Override
         public void addOrder(Order order) {
             if (order != null) {
-                pendingOrders.add(order);
+                pendingList.add(order);
+                priorityQueue.add(order);
             }
         }
 
         @Override
         public Collection<Order> getAllPendingOrders() {
-            List<Order> sortedList = new ArrayList<>(pendingOrders);
-            Collections.sort(sortedList);
-            return sortedList;
+            // Mengembalikan seluruh daftar antrean pesanan aktif dalam urutan masuk (Fitur
+            // 2 - Lihat Order)
+            return new ArrayList<>(pendingList);
         }
 
         @Override
         public Order getNextPriorityOrder() {
-            return pendingOrders.poll();
+            // Mengambil pesanan dengan prioritas tertinggi (Fitur 3 - Priority Queue)
+            Order nextOrder = priorityQueue.poll();
+            if (nextOrder != null) {
+                pendingList.remove(nextOrder);
+            }
+            return nextOrder;
         }
 
         @Override
@@ -183,6 +190,14 @@ public class WarehouseSystem {
         @Override
         public Stack<Order> getHistoryStack() {
             return completedOrders;
+        }
+
+        // Helper method untuk menampilkan antrean yang sudah diurutkan berdasarkan
+        // prioritas tanpa memodifikasi data
+        public Collection<Order> getOrdersSortedByPriority() {
+            List<Order> sortedList = new ArrayList<>(pendingList);
+            Collections.sort(sortedList);
+            return sortedList;
         }
     }
 
@@ -249,20 +264,23 @@ public class WarehouseSystem {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        OrderManagementModule manager = new OrderManager();
+        OrderManager manager = new OrderManager();
 
         System.out.println("=======================================================");
         System.out.println(" WAREHOUSE ROBOT OPTIMIZATION GAME - CODE BLUEPRINT");
         System.out.println("=======================================================");
 
         while (true) {
-            System.out.println("\n=== MENU UTAMA (MODUL ORDER & STATE) ===");
-            System.out.println("1. Tambah Order Baru");
-            System.out.println("2. Lihat Semua Order Tertunda");
-            System.out.println("3. Proses Order Prioritas Tertinggi");
-            System.out.println("4. Lihat Riwayat Order Selesai");
-            System.out.println("5. Keluar");
-            System.out.print("Pilih opsi (1-5): ");
+            System.out.println("\n=== MENU UTAMA SISTEM GUDANG ===");
+            System.out.println("1. Tambah Order   (Menambahkan pesanan baru)");
+            System.out.println("2. Lihat Order    (Melihat antrean pesanan - Urutan Masuk)");
+            System.out.println("3. Priority Queue (Mengurutkan pesanan & proses berdasarkan prioritas)");
+            System.out.println("4. Layout Gudang  (Menampilkan graph gudang)");
+            System.out.println("5. Shortest Path  (Mencari rute tercepat)");
+            System.out.println("6. Simulasi Robot (Robot mengambil barang)");
+            System.out.println("7. Riwayat        (Melihat order yang selesai - LIFO Stack)");
+            System.out.println("8. Keluar");
+            System.out.print("Pilih opsi (1-8): ");
 
             int choice = -1;
             if (scanner.hasNextInt()) {
@@ -299,10 +317,11 @@ public class WarehouseSystem {
                         break;
                     }
                     manager.addOrder(new Order(orderId, itemName, nodeId, priority));
-                    System.out.println("Order berhasil ditambahkan!");
+                    System.out.println("Order berhasil ditambahkan ke antrean!");
                     break;
+
                 case 2:
-                    System.out.println("\n--- Daftar Semua Pesanan Tertunda (Urut Prioritas) ---");
+                    System.out.println("\n--- Daftar Semua Pesanan Tertunda (Urutan Masuk) ---");
                     Collection<Order> pending = manager.getAllPendingOrders();
                     if (pending.isEmpty()) {
                         System.out.println("(Tidak ada pesanan tertunda)");
@@ -312,18 +331,45 @@ public class WarehouseSystem {
                         }
                     }
                     break;
+
                 case 3:
-                    System.out.println("\n--- Memproses Pesanan Prioritas Tertinggi ---");
-                    Order nextOrder = manager.getNextPriorityOrder();
-                    if (nextOrder == null) {
-                        System.out.println("Tidak ada pesanan tertunda untuk diproses.");
-                    } else {
-                        System.out.println("Memproses: " + nextOrder);
-                        manager.archiveCompletedOrder(nextOrder);
-                        System.out.println(" -> Selesai dan diarsipkan ke riwayat.");
+                    System.out.println("\n--- Daftar Antrean Pesanan (Urutan Prioritas) ---");
+                    Collection<Order> sortedPending = manager.getOrdersSortedByPriority();
+                    if (sortedPending.isEmpty()) {
+                        System.out.println("(Tidak ada pesanan tertunda)");
+                        break;
+                    }
+
+                    for (Order o : sortedPending) {
+                        System.out.println(" [Prioritas " + o.getPriority() + "] " + o);
+                    }
+
+                    System.out
+                            .print("\nApakah Anda ingin memproses order dengan prioritas tertinggi sekarang? (y/n): ");
+                    String answer = scanner.nextLine().trim().toLowerCase();
+                    if (answer.equals("y") || answer.equals("ya")) {
+                        Order nextOrder = manager.getNextPriorityOrder();
+                        if (nextOrder != null) {
+                            System.out.println("Memproses: " + nextOrder);
+                            manager.archiveCompletedOrder(nextOrder);
+                            System.out.println(" -> Selesai dan diarsipkan ke riwayat (Fitur 7).");
+                        }
                     }
                     break;
+
                 case 4:
+                    System.out.println("\n[INFO] Fitur 4 (Layout Gudang).");
+                    break;
+
+                case 5:
+                    System.out.println("\n[INFO] Fitur 5 (Shortest Path) .");
+                    break;
+
+                case 6:
+                    System.out.println("\n[INFO] Fitur 6 (Simulasi Robot).");
+                    break;
+
+                case 7:
                     System.out.println("\n--- Riwayat Pesanan Selesai (LIFO - Terbaru Paling Atas) ---");
                     Stack<Order> history = manager.getHistoryStack();
                     if (history.isEmpty()) {
@@ -336,12 +382,14 @@ public class WarehouseSystem {
                         }
                     }
                     break;
-                case 5:
+
+                case 8:
                     System.out.println("Keluar dari program. Terima kasih!");
                     scanner.close();
                     return;
+
                 default:
-                    System.out.println("Pilihan tidak valid. Silakan pilih 1-5.");
+                    System.out.println("Pilihan tidak valid. Silakan pilih 1-8.");
             }
         }
     }
