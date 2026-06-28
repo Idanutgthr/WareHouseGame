@@ -150,6 +150,42 @@ public class WarehouseSystem {
         Stack<Order> getHistoryStack();
     }
 
+    public static class OrderManager implements OrderManagementModule {
+        private final PriorityQueue<Order> pendingOrders = new PriorityQueue<>();
+        private final Stack<Order> completedOrders = new Stack<>();
+
+        @Override
+        public void addOrder(Order order) {
+            if (order != null) {
+                pendingOrders.add(order);
+            }
+        }
+
+        @Override
+        public Collection<Order> getAllPendingOrders() {
+            List<Order> sortedList = new ArrayList<>(pendingOrders);
+            Collections.sort(sortedList);
+            return sortedList;
+        }
+
+        @Override
+        public Order getNextPriorityOrder() {
+            return pendingOrders.poll();
+        }
+
+        @Override
+        public void archiveCompletedOrder(Order completedOrder) {
+            if (completedOrder != null) {
+                completedOrders.push(completedOrder);
+            }
+        }
+
+        @Override
+        public Stack<Order> getHistoryStack() {
+            return completedOrders;
+        }
+    }
+
     // MODUL 2: CORE ENGINE & ROUTE OPTIMIZATION
 
     public interface RouteOptimizationModule {
@@ -212,11 +248,101 @@ public class WarehouseSystem {
     // MAIN ENTRY POINT (Simulasi Alur Kerja Aplikasi / Mock Test)
 
     public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        OrderManagementModule manager = new OrderManager();
+
         System.out.println("=======================================================");
         System.out.println(" WAREHOUSE ROBOT OPTIMIZATION GAME - CODE BLUEPRINT");
         System.out.println("=======================================================");
-        System.out.println("File template sukses di-load.");
-        System.out.println("Gunakan struktur interface di atas sebagai 'jembatan' integrasi kelompok.");
-        System.out.println("Silakan bagikan file ini ke Anggota 1, 2, dan 3.");
+
+        while (true) {
+            System.out.println("\n=== MENU UTAMA (MODUL ORDER & STATE) ===");
+            System.out.println("1. Tambah Order Baru");
+            System.out.println("2. Lihat Semua Order Tertunda");
+            System.out.println("3. Proses Order Prioritas Tertinggi");
+            System.out.println("4. Lihat Riwayat Order Selesai");
+            System.out.println("5. Keluar");
+            System.out.print("Pilih opsi (1-5): ");
+
+            int choice = -1;
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+                scanner.nextLine(); // consume newline
+            } else {
+                scanner.nextLine(); // clear invalid input
+            }
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Masukkan ID Order: ");
+                    String orderId = scanner.nextLine().trim();
+                    System.out.print("Masukkan Nama Barang: ");
+                    String itemName = scanner.nextLine().trim();
+                    System.out.print("Masukkan ID Node Lokasi Barang (Angka): ");
+                    int nodeId = 0;
+                    if (scanner.hasNextInt()) {
+                        nodeId = scanner.nextInt();
+                        scanner.nextLine();
+                    } else {
+                        System.out.println("ID Node harus berupa angka. Gagal menambahkan.");
+                        scanner.nextLine();
+                        break;
+                    }
+                    System.out.print("Masukkan Prioritas (1 = Biasa, 3 = Penting, 5 = VIP): ");
+                    int priority = 1;
+                    if (scanner.hasNextInt()) {
+                        priority = scanner.nextInt();
+                        scanner.nextLine();
+                    } else {
+                        System.out.println("Prioritas harus berupa angka. Gagal menambahkan.");
+                        scanner.nextLine();
+                        break;
+                    }
+                    manager.addOrder(new Order(orderId, itemName, nodeId, priority));
+                    System.out.println("Order berhasil ditambahkan!");
+                    break;
+                case 2:
+                    System.out.println("\n--- Daftar Semua Pesanan Tertunda (Urut Prioritas) ---");
+                    Collection<Order> pending = manager.getAllPendingOrders();
+                    if (pending.isEmpty()) {
+                        System.out.println("(Tidak ada pesanan tertunda)");
+                    } else {
+                        for (Order o : pending) {
+                            System.out.println(" - " + o);
+                        }
+                    }
+                    break;
+                case 3:
+                    System.out.println("\n--- Memproses Pesanan Prioritas Tertinggi ---");
+                    Order nextOrder = manager.getNextPriorityOrder();
+                    if (nextOrder == null) {
+                        System.out.println("Tidak ada pesanan tertunda untuk diproses.");
+                    } else {
+                        System.out.println("Memproses: " + nextOrder);
+                        manager.archiveCompletedOrder(nextOrder);
+                        System.out.println(" -> Selesai dan diarsipkan ke riwayat.");
+                    }
+                    break;
+                case 4:
+                    System.out.println("\n--- Riwayat Pesanan Selesai (LIFO - Terbaru Paling Atas) ---");
+                    Stack<Order> history = manager.getHistoryStack();
+                    if (history.isEmpty()) {
+                        System.out.println("(Riwayat kosong)");
+                    } else {
+                        @SuppressWarnings("unchecked")
+                        Stack<Order> tempStack = (Stack<Order>) history.clone();
+                        while (!tempStack.isEmpty()) {
+                            System.out.println(" - " + tempStack.pop());
+                        }
+                    }
+                    break;
+                case 5:
+                    System.out.println("Keluar dari program. Terima kasih!");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Pilihan tidak valid. Silakan pilih 1-5.");
+            }
+        }
     }
 }
