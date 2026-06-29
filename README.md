@@ -1,15 +1,14 @@
 # Warehouse Robot Route Optimization Game (Quick Route)
-### Responsi Akhir - Mata Kuliah Struktur Data dan Algoritma
+### Responsi Akhir - Struktur Data dan Algoritma
 
 Proyek Penugasan Responsi Akhir mata kuliah Struktur Data dan Algoritma (SDA). Proyek ini memilih **Tema 1: Route Optimization and Network-Based Systems**, dengan ide pengembangan kreatif berupa sebuah game simulasi pergudangan 2D interaktif berbasis **Pure Java (Java Swing & Command Line Interface)** dengan bumbu gameplay **Idle Tycoon**.
 
 ---
 
-## 👥 Anggota Kelompok
-*Silakan ganti nama dan NIM di bawah ini sesuai kelompok Anda sebelum dikumpulkan:*
+## 👥 Anggota Kelompok & Kontribusi
 1. **[Wildan Saputra Wibowo]** - NIM: **[L0125070]** (Bertanggung jawab pada Modul 2: Route Optimization & Dijkstra)
 2. **[Muhammad Regan Azfar Aziza]** - NIM: **[L0125054]** (Bertanggung jawab pada Modul 1: Order & State Management)
-3. **[Ridwan Surya Pamuji]** - NIM: **[L0125131]** (Bertanggung jawab pada Modul 3: GUI Swing, Animasi, & Integrasi)
+3. **[Ridwan Surya Pamuji]** - NIM: **[L0125131]** (Bertanggung jawab pada Modul 3: GUI Swing, Animasi, & Integrasi Fondasi Sistem Route dan Order)
 
 ---
 
