@@ -5,10 +5,39 @@ Proyek Penugasan Responsi Akhir mata kuliah Struktur Data dan Algoritma (SDA). P
 
 ---
 
-## 👥 Anggota Kelompok & Kontribusi
-1. **[Wildan Saputra Wibowo]** - NIM: **[L0125070]** (Bertanggung jawab pada Modul 2: Route Optimization & Dijkstra)
-2. **[Muhammad Regan Azfar Aziza]** - NIM: **[L0125054]** (Bertanggung jawab pada Modul 1: Order & State Management)
-3. **[Ridwan Surya Pamuji]** - NIM: **[L0125131]** (Bertanggung jawab pada Modul 3: GUI Swing, Animasi, & Integrasi Fondasi Sistem Route dan Order)
+===========================================================
+LEMBAR PENILAIAN KONTRIBUSI ANGGOTA KELOMPOK
+===========================================================
+Tema Proyek  : Warehouse Robot Optimization Game
+Kelompok     : 1
+
+1. Nama Anggota : Wildan Saputra Wibowo
+   NIM          : L0125070
+   Kontribusi   : Bertanggung jawab pada Modul 2, yaitu
+                  Route Optimization & Dijkstra.
+                  Mengimplementasikan algoritma Dijkstra,
+                  mengembangkan sistem optimasi rute robot,
+                  serta mengintegrasikan perhitungan jalur
+                  terpendek ke dalam simulasi.
+
+2. Nama Anggota : Muhammad Regan Azfar Aziza
+   NIM          : L0125054
+   Kontribusi   : Bertanggung jawab pada Modul 1, yaitu
+                  Order & State Management.
+                  Mengembangkan sistem pengelolaan order,
+                  manajemen status pesanan dan robot,
+                  serta logika dasar proses distribusi barang.
+
+3. Nama Anggota : Ridwan Surya Pamuji
+   NIM          : L0125131
+   Kontribusi   : Bertanggung jawab pada Modul 3, yaitu
+                  GUI Swing, Animasi, dan Integrasi Fondasi
+                  Sistem Route & Order.
+                  Mengembangkan antarmuka menggunakan Java Swing,
+                  membuat animasi pergerakan robot, serta
+                  mengintegrasikan seluruh modul menjadi
+                  aplikasi yang berjalan secara terpadu.
+===========================================================
 
 ---
 
