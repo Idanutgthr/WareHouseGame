@@ -217,16 +217,107 @@ public class WarehouseSystem {
          * SHORTEST PATH (DIJKSTRA ALGORITHM)
          * Mencari jalur terpendek dari posisi robot saat ini menuju ke node tempat
          * barang berada.
-         * Analisis Kompleksitas Waktu wajib dijelaskan saat Demo (O((V + E) log V)
-         * dengan PriorityQueue).
-         * * @param graph Denah gudang aktif
-         * 
+         * @param graph Denah gudang aktif
          * @param startNode Posisi node robot saat ini
-         * @param endNode   Node tujuan (lokasi barang dari data Order)
+         * @param endNode Node tujuan (lokasi barang dari data Order)
          * @return List Urutan ID Node yang harus dilewati robot dari start sampai
          *         finish (Lintasan Terpendek).
          */
         List<Integer> calculateShortestPath(WarehouseGraph graph, int startNode, int endNode);
+    }
+
+    public static class NodeDistance implements Comparable<NodeDistance> {
+        int nodeId;
+        int distance;
+
+        public NodeDistance(int nodeId, int distance) {
+            this.nodeId = nodeId;
+            this.distance = distance;
+        }
+
+        @Override
+        public int compareTo(NodeDistance other) {
+            return Integer.compare(this.distance, other.distance);
+        }
+    }
+
+    public static class RouteOptimizer implements RouteOptimizationModule {
+        @Override
+        public WarehouseGraph createDefaultWarehouseLayout() {
+            WarehouseGraph graph = new WarehouseGraph(10);
+            
+            // Tambahkan jalur antartitik rak/lorong dengan bobot jarak
+            graph.addEdge(0, 1, 2);
+            graph.addEdge(0, 2, 5);
+            graph.addEdge(1, 3, 4);
+            graph.addEdge(1, 4, 3);
+            graph.addEdge(2, 4, 1);
+            graph.addEdge(2, 5, 6);
+            graph.addEdge(3, 6, 2);
+            graph.addEdge(4, 6, 3);
+            graph.addEdge(4, 7, 5);
+            graph.addEdge(5, 7, 2);
+            graph.addEdge(6, 8, 3);
+            graph.addEdge(7, 9, 4);
+            graph.addEdge(8, 9, 1);
+            
+            return graph;
+        }
+
+        @Override
+        public List<Integer> calculateShortestPath(WarehouseGraph graph, int startNode, int endNode) {
+            int totalNodes = graph.getTotalNodes();
+            
+            if (startNode < 0 || startNode >= totalNodes || endNode < 0 || endNode >= totalNodes) {
+                return new ArrayList<>();
+            }
+            
+            int[] dist = new int[totalNodes];
+            int[] parent = new int[totalNodes];
+            Arrays.fill(dist, Integer.MAX_VALUE);
+            Arrays.fill(parent, -1);
+            
+            PriorityQueue<NodeDistance> pq = new PriorityQueue<>();
+            dist[startNode] = 0;
+            pq.add(new NodeDistance(startNode, 0));
+            
+            boolean[] visited = new boolean[totalNodes];
+            
+            while (!pq.isEmpty()) {
+                NodeDistance curr = pq.poll();
+                int u = curr.nodeId;
+                
+                if (visited[u]) continue;
+                visited[u] = true;
+                
+                if (u == endNode) break;
+                
+                List<Edge> edges = graph.getAdjList().get(u);
+                if (edges != null) {
+                    for (Edge edge : edges) {
+                        int v = edge.getDestination();
+                        int weight = edge.getWeight();
+                        if (!visited[v] && dist[u] != Integer.MAX_VALUE && dist[u] + weight < dist[v]) {
+                            dist[v] = dist[u] + weight;
+                            parent[v] = u;
+                            pq.add(new NodeDistance(v, dist[v]));
+                        }
+                    }
+                }
+            }
+            
+            List<Integer> path = new ArrayList<>();
+            if (dist[endNode] == Integer.MAX_VALUE) {
+                return path; // No path found
+            }
+            
+            int currNode = endNode;
+            while (currNode != -1) {
+                path.add(0, currNode);
+                currNode = parent[currNode];
+            }
+            return path;
+        }
     }
 
     // MODUL 3: GUI, SIMULATION & INTEGRATION
@@ -265,6 +356,9 @@ public class WarehouseSystem {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         OrderManager manager = new OrderManager();
+        RouteOptimizer routeOptimizer = new RouteOptimizer();
+        WarehouseGraph graph = routeOptimizer.createDefaultWarehouseLayout();
+        int robotPosition = 0; // Posisi awal robot di Node 0
 
         System.out.println("=======================================================");
         System.out.println(" WAREHOUSE ROBOT OPTIMIZATION GAME - CODE BLUEPRINT");
@@ -358,15 +452,95 @@ public class WarehouseSystem {
                     break;
 
                 case 4:
-                    System.out.println("\n[INFO] Fitur 4 (Layout Gudang).");
+                    System.out.println("\n--- DENAH LAYOUT GUDANG ---");
+                    for (int i = 0; i < graph.getTotalNodes(); i++) {
+                        System.out.print("Node " + i);
+                        if (i == robotPosition) {
+                            System.out.print(" [Robot Saat Ini]");
+                        }
+                        System.out.print(" terhubung ke: ");
+                        List<Edge> edges = graph.getAdjList().get(i);
+                        for (int j = 0; j < edges.size(); j++) {
+                            Edge e = edges.get(j);
+                            System.out.print("Node " + e.getDestination() + " (Jarak: " + e.getWeight() + "m)");
+                            if (j < edges.size() - 1) {
+                                System.out.print(", ");
+                            }
+                        }
+                        System.out.println();
+                    }
                     break;
 
                 case 5:
-                    System.out.println("\n[INFO] Fitur 5 (Shortest Path) .");
+                    System.out.println("\n--- PENCARIAN RUTE TERCEPAT ---");
+                    System.out.print("Masukkan Node Asal (0-" + (graph.getTotalNodes() - 1) + "): ");
+                    int startNode = 0;
+                    if (scanner.hasNextInt()) {
+                        startNode = scanner.nextInt();
+                        scanner.nextLine();
+                    } else {
+                        System.out.println("Node Asal harus berupa angka.");
+                        scanner.nextLine();
+                        break;
+                    }
+                    System.out.print("Masukkan Node Tujuan (0-" + (graph.getTotalNodes() - 1) + "): ");
+                    int endNode = 0;
+                    if (scanner.hasNextInt()) {
+                        endNode = scanner.nextInt();
+                        scanner.nextLine();
+                    } else {
+                        System.out.println("Node Tujuan harus berupa angka.");
+                        scanner.nextLine();
+                        break;
+                    }
+                    List<Integer> path = routeOptimizer.calculateShortestPath(graph, startNode, endNode);
+                    if (path.isEmpty()) {
+                        System.out.println("Tidak ada jalur yang ditemukan dari Node " + startNode + " ke Node " + endNode);
+                    } else {
+                        System.out.print("Jalur terpendek: ");
+                        for (int i = 0; i < path.size(); i++) {
+                            System.out.print(path.get(i));
+                            if (i < path.size() - 1) {
+                                System.out.print(" -> ");
+                            }
+                        }
+                        System.out.println();
+                    }
                     break;
 
                 case 6:
-                    System.out.println("\n[INFO] Fitur 6 (Simulasi Robot).");
+                    Order activeOrder = manager.getNextPriorityOrder();
+                    if (activeOrder == null) {
+                        System.out.println("\nTidak ada pesanan tertunda untuk disimulasikan.");
+                        break;
+                    }
+                    System.out.println("\n--- SIMULASI ROBOT MENGAMBIL BARANG ---");
+                    System.out.println("Pesanan Aktif: " + activeOrder);
+                    System.out.println("Posisi Robot Saat Ini: Node " + robotPosition);
+                    System.out.println("Lokasi Barang: Node " + activeOrder.getTargetNodeId());
+
+                    List<Integer> route = routeOptimizer.calculateShortestPath(graph, robotPosition, activeOrder.getTargetNodeId());
+                    if (route.isEmpty()) {
+                        System.out.println("Robot Gagal: Rute ke lokasi barang tidak ditemukan!");
+                        manager.addOrder(activeOrder); // Kembalikan order jika gagal
+                    } else {
+                        System.out.println("Robot bergerak menyusuri rute:");
+                        for (int i = 0; i < route.size(); i++) {
+                            System.out.print("Node " + route.get(i));
+                            if (i < route.size() - 1) {
+                                System.out.print(" -> ");
+                            }
+                            try {
+                                Thread.sleep(500); // Simulasi waktu pergerakan robot
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                            }
+                        }
+                        System.out.println("\nRobot sampai di Node " + activeOrder.getTargetNodeId() + " dan mengambil " + activeOrder.getItemName());
+                        robotPosition = activeOrder.getTargetNodeId();
+                        manager.archiveCompletedOrder(activeOrder);
+                        System.out.println("Pesanan selesai dan diarsipkan.");
+                    }
                     break;
 
                 case 7:
