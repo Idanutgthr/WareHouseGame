@@ -3,16 +3,20 @@
 
 Proyek Penugasan Responsi Akhir mata kuliah Struktur Data dan Algoritma (SDA). Proyek ini memilih **Tema 1: Route Optimization and Network-Based Systems**, dengan ide pengembangan kreatif berupa sebuah game simulasi pergudangan 2D interaktif berbasis **Pure Java (Java Swing & Command Line Interface)** dengan bumbu gameplay **Idle Tycoon**.
 
----
+===========================================================
+
+LEMBAR PENILAIAN KONTRIBUSI ANGGOTA KELOMPOK
 
 ===========================================================
-LEMBAR PENILAIAN KONTRIBUSI ANGGOTA KELOMPOK
-===========================================================
+
 Tema Proyek  : Warehouse Robot Optimization Game
+
 Kelompok     : 1
 
 1. Nama Anggota : Wildan Saputra Wibowo
+
    NIM          : L0125070
+   
    Kontribusi   : Bertanggung jawab pada Modul 2, yaitu
                   Route Optimization & Dijkstra.
                   Mengimplementasikan algoritma Dijkstra,
@@ -21,7 +25,9 @@ Kelompok     : 1
                   terpendek ke dalam simulasi.
 
 2. Nama Anggota : Muhammad Regan Azfar Aziza
+   
    NIM          : L0125054
+   
    Kontribusi   : Bertanggung jawab pada Modul 1, yaitu
                   Order & State Management.
                   Mengembangkan sistem pengelolaan order,
@@ -29,7 +35,9 @@ Kelompok     : 1
                   serta logika dasar proses distribusi barang.
 
 3. Nama Anggota : Ridwan Surya Pamuji
+   
    NIM          : L0125131
+   
    Kontribusi   : Bertanggung jawab pada Modul 3, yaitu
                   GUI Swing, Animasi, dan Integrasi Fondasi
                   Sistem Route & Order.
@@ -37,9 +45,9 @@ Kelompok     : 1
                   membuat animasi pergerakan robot, serta
                   mengintegrasikan seluruh modul menjadi
                   aplikasi yang berjalan secara terpadu.
+
 ===========================================================
 
----
 
 ## 🚀 Fitur Utama Program
 
